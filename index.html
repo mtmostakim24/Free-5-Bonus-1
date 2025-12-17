@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বিজ্ঞাপন লোড হচ্ছে...</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Nirmala UI', sans-serif;
+      background: linear-gradient(135deg, #0c2461, #1e3799, #4a69bd);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+      animation: moveBackground 60s linear infinite;
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 40px 0;
+    }
+
+    .multi-spinner {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+    }
+
+    .spinner-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid transparent;
+    }
+
+    .ring-1 {
+      border-top: 4px solid #00ffea;
+      animation: spin 2s linear infinite;
+      box-shadow: 0 0 15px rgba(0, 255, 234, 0.5);
+    }
+
+    .ring-2 {
+      border-right: 4px solid #ff416c;
+      animation: spinReverse 1.8s linear infinite;
+      width: 90%;
+      height: 90%;
+      top: 5%;
+      left: 5%;
+      box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
+    }
+
+    .ring-3 {
+      border-bottom: 4px solid #24ff00;
+      animation: spin 2.2s linear infinite;
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+      box-shadow: 0 0 15px rgba(36, 255, 0, 0.5);
+    }
+
+    .loading-text {
+      font-size: 1.3rem;
+      margin-top: 20px;
+      font-weight: 600;
+      color: #f1f1f1;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    .progress-container {
+      width: 80%;
+      max-width: 400px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 20px auto;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00ffea, #24ff00);
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+
+    .counter {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffd32a;
+      margin-top: 10px;
+      display: inline-block;
+      padding: 5px 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #00ffea, #24ff00);
+      color: #0c2461;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .ad-info {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 30px;
+      border-left: 4px solid #ff416c;
+      animation: fadeIn 1s ease-out 0.5s both;
+    }
+
+    .ad-info h3 {
+      margin-bottom: 10px;
+      color: #ffd32a;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spinReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes moveBackground {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .subtitle { font-size: 1rem; }
+      .container { padding: 20px; }
+      .loading-text { font-size: 1.1rem; }
+      .action-buttons { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔗 বিশেষ অফার লোড হচ্ছে...</h1>
+    <p class="subtitle">এই এক্সক্লুসিভ ডিসকাউন্টটি শুধুমাত্র আপনার জন্য প্রস্তুত।</p>
+    
+    <div class="loader-container">
+      <div class="multi-spinner">
+        <div class="spinner-ring ring-1"></div>
+        <div class="spinner-ring ring-2"></div>
+        <div class="spinner-ring ring-3"></div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <p class="loading-text" id="loadingText">অফার লোড হচ্ছে...</p>
+      <div class="counter" id="counter">10</div>
+      
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="goNowBtn">
+          <span>⚡</span> এখনই যান
+        </button>
+        <button class="btn btn-secondary" id="waitBtn">
+          <span>⏳</span> অপেক্ষা করুন
+        </button>
+      </div>
+    </div>
+    
+    <div class="ad-info">
+      <h3>📢 এই অফার সম্পর্কে</h3>
+      <p>আপনি একটি <strong>বিশেষ ডিসকাউন্ট অফার</strong> দেখতে যাচ্ছেন। এই পেজটি <strong id="timeLeft">১০</strong> সেকেন্ডের মধ্যে স্বয়ংক্রিয়ভাবে লোড হবে।</p>
+      <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">অফারটি সীমিত সময়ের জন্য, তাই দ্রুত একশন নিন!</p>
+    </div>
+    
+    <div class="footer">
+      <p>© ২০২৬ এক্সক্লুসিভ অফার | সকল অধিকার সংরক্ষিত</p>
+    </div>
+  </div>
+
+  <script>
+    // 🔗 আপনার SINGLE Adsterra Direct লিংকটি এখানে বসান
+    const AD_LINK = "https://www.effectivegatecpm.com/fsphyy1evx?key=d8fc3c9447eb6f60ff81210a26bd0842";
+    const AD_NAME = "বিশেষ ডিসকাউন্ট অফার";
+    
+    // এলিমেন্ট সিলেক্ট
+    const progressBar = document.getElementById('progressBar');
+    const counter = document.getElementById('counter');
+    const timeLeft = document.getElementById('timeLeft');
+    const loadingText = document.getElementById('loadingText');
+    const goNowBtn = document.getElementById('goNowBtn');
+    const waitBtn = document.getElementById('waitBtn');
+    
+    // লোডিং মেসেজের তালিকা
+    const loadingMessages = [
+      "অফার প্রস্তুত করা হচ্ছে...",
+      "ডিসকাউন্ট কোড জেনারেট হচ্ছে...",
+      "সেরা দাম নিশ্চিত করা হচ্ছে...",
+      "প্রসেসিং সম্পন্ন হচ্ছে...",
+      "প্রস্তুত! রিডাইরেক্ট হতে প্রস্তুত..."
+    ];
+    
+    let time = 10; // সেকেন্ড (আপনি 5-10 সেকেন্ড রাখতে পারেন)
+    let progress = 0;
+    let messageIndex = 0;
+    let timer;
+    
+    // রিডাইরেক্ট ফাংশন
+    function redirectToAd() {
+      clearInterval(timer);
+      loadingText.textContent = "রিডাইরেক্ট করা হচ্ছে...";
+      progressBar.style.width = "100%";
+      counter.textContent = "0";
+      timeLeft.textContent = "0";
+      
+      // ০.৫ সেকেন্ড পরে রিডাইরেক্ট
+      setTimeout(() => {
+        window.location.href = AD_LINK;
+      }, 500);
+    }
+    
+    // কাউন্টডাউন টাইমার শুরু করুন
+    function startTimer() {
+      timer = setInterval(() => {
+        time--;
+        counter.textContent = time;
+        timeLeft.textContent = time;
+        
+        // প্রোগ্রেস বার আপডেট
+        progress = 100 - (time * 10);
+        progressBar.style.width = `${progress}%`;
+        
+        // প্রতি ২ সেকেন্ডে লোডিং মেসেজ পরিবর্তন
+        if (time % 2 === 0) {
+          loadingText.textContent = loadingMessages[messageIndex % loadingMessages.length];
+          messageIndex++;
+        }
+        
+        // সময় শেষ হলে রিডাইরেক্ট
+        if (time <= 0) {
+          redirectToAd();
+        }
+      }, 1000);
+    }
+    
+    // ইভেন্ট লিসেনার
+    goNowBtn.addEventListener('click', () => {
+      if(confirm(`আপনি কি "${AD_NAME}" তে এখনই যেতে চান?`)) {
+        redirectToAd();
+      }
+    });
+    
+    waitBtn.addEventListener('click', () => {
+      alert(`আপনি অপেক্ষা করছেন। এই পেজটি ${time} সেকেন্ডের মধ্যে স্বয়ংক্রিয়ভাবে লোড হবে।`);
+    });
+    
+    // টাইমার শুরু
+    startTimer();
+    
+    // মোবাইল ডিভাইসের জন্য অতিরিক্ত ইফেক্ট
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      document.body.style.background = "linear-gradient(135deg, #0c2461, #1e3799)";
+    }
+  </script>
+</body>
+</html>
